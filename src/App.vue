@@ -1,15 +1,23 @@
 <template>
   <img alt="Vue logo" src="./assets/logo.png">
   <h1>{{count}}</h1>
-  <h2>{{double}}</h2>
+  <!-- <h2>{{double}}</h2>
   <h3 v-for="num in numberArr" :key="num">{{num}}</h3>
-  <h4>{{person.name}}</h4>
-  <button @click="increase">d(^^*)+1</button>
+  <h4>{{person.name}}</h4> -->
+  <h5>鼠标位置：{{x}}-{{y}} ,←：{{lx}},↓：{{ly}}</h5>
+  <!-- <button @click="changeTitLE">改变title</button>
+  <button @click="increase">d(^^*)+1</button> -->
+    <h5 v-if="loading">ewrw</h5>
+    <img :src="imgUrl" alt="">
+
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { computed,reactive,toRefs} from "vue";
+import { ref,computed,reactive,toRefs,watch} from "vue";
+import MouseMove from "./hooks/MouseMove";
+import { reactiveMouseMove } from "./hooks/reactiveMouseMove";
+import { getLoading } from "./hooks/getLoading";
 interface DateProps {
   count: number;
   double: number;
@@ -24,8 +32,7 @@ export default defineComponent({
   props:{
     title: String,
   },
-  setup(props) {
-    console.log(props.title)
+  setup() {
     // const count = ref(0)
     // const increase = ()=> {
     //   return  count.value++
@@ -33,6 +40,22 @@ export default defineComponent({
     // const double = computed(()=>{
     //  return count.value*2
     // })
+    // onBeforeUpdate(()=>{
+    //   console.log('onBeforeUpdate')
+    // })
+    // onBeforeMount(()=>{
+    //   console.log('onBeforeMount')
+    // })
+    // onRenderTracked((event)=>{
+    //   console.log(event.key)
+    // })
+    const title = ref('')
+    const changeTitLE =()=>{
+      return title.value += 'hello world!'
+    }
+    const loadingState = toRefs(getLoading('https://dog.ceo/api/breeds/image/random'))
+    const { x,y} = MouseMove()
+    const position = toRefs(reactiveMouseMove())
     const countDate: DateProps = reactive({
       count:0,
       increase:()=>{
@@ -46,11 +69,22 @@ export default defineComponent({
     })
     countDate.numberArr[0]=10
     countDate.person.name = "lisa"
+    watch([title,()=>countDate.count],(newValue,oldValue)=> {
+      console.log('new-'+newValue,'old-'+oldValue);
+      document.title ='update'+ title.value+countDate.count
+    })
     const showCountData = toRefs(countDate)
     return{
-      ...showCountData
+      ...showCountData,
+      changeTitLE,
+      x,
+      y,
+      ...position,
+      ...loadingState
     }
-  }
+
+  },
+
 });
 </script>
 
