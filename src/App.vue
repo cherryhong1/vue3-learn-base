@@ -1,6 +1,23 @@
 <template>
+<div>
+                  <!-- <h4>{{err}}</h4> -->
   <img alt="Vue logo"
        src="./assets/logo.png">
+       <Suspense>
+         <template #default>
+           <!-- <asynccSupend></asynccSupend> -->
+           <dog-test></dog-test>
+
+         </template>
+         <template #fallback>
+           <h3>老丁·</h3>
+         </template>
+       </Suspense>
+       <asynccSupend></asynccSupend> 
+
+  <Model :isOpen="isOpen"
+         @close-model="closeModel">{{isOpen}}</Model>
+<button @click="openModel">打开Model{{isOpen}}</button>
   <h1>{{count}}</h1>
   <!-- <h2>{{double}}</h2>
   <h3 v-for="num in numberArr" :key="num">{{num}}</h3>
@@ -8,19 +25,25 @@
   <h5>鼠标位置：{{x}}-{{y}} ,←：{{lx}},↓：{{ly}}</h5>
   <!-- <button @click="changeTitLE">改变title</button>
   <button @click="increase">d(^^*)+1</button> -->
-  <h5 v-if="loading">ewrw</h5>
+  <!-- <h5 v-if="loading">ewrw</h5>
   <img v-if="result.url&&result.url!=null"
        :src="result.url"
-       alt="">
-
+       alt=""> -->
+  <!-- <hello-world></hello-world> -->
+  </div>
 </template>
 
 <script lang="ts">
+import Model from "./components/Model";
+// import HelloWorld from "./components/HelloWorld";
+import asynccSupend from "./components/asyncSupend";
+import dogTest from "./components/dogOnline"
 import { defineComponent } from "vue";
-import { ref, computed, reactive, toRefs, watch } from "vue";
+import { ref, computed, reactive, toRefs, watch ,onErrorCaptured} from "vue";
 import MouseMove from "./hooks/MouseMove";
 import { reactiveMouseMove } from "./hooks/reactiveMouseMove";
 import { getLoading } from "./hooks/getLoading";
+
 interface DateProps {
   count: number;
   double: number;
@@ -96,6 +119,22 @@ export default defineComponent({
       document.title = "update" + title.value + countDate.count;
     });
     const showCountData = toRefs(countDate);
+    const ModelOpen = reactive({
+      isOpen: false,
+      closeModel: () => {
+        ModelOpen.isOpen = false;
+        console.log( ModelOpen.isOpen)
+      },
+      openModel: () => {
+       ModelOpen.isOpen = !ModelOpen.isOpen;
+      },
+    });
+    const showModelOpen = toRefs(ModelOpen)
+    const err = ref(null)
+    onErrorCaptured((e: any)=>{
+      err.value = e
+      return true
+    })
     return {
       ...showCountData,
       changeTitLE,
@@ -104,7 +143,15 @@ export default defineComponent({
       ...position,
       ...loadingState,
       result,
+      ...showModelOpen,
+      err
     };
+  },
+  components: {
+    Model,
+    asynccSupend,
+    dogTest
+    // HelloWorld,
   },
 });
 </script>

@@ -39,6 +39,10 @@ export default defineComponent({
   props: {
     msg: String,
   },
+  setup(props,context){
+    console.log(props.msg)
+    console.log(context)
+  }
 });
 </script>
 
